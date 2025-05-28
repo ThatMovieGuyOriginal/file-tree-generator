@@ -3,9 +3,19 @@
 import React, { useState, useRef } from 'react';
 import { Download, GitBranch, FileText, Folder, ChevronRight, ChevronDown, Plus, Trash2, Edit3, Save, X } from 'lucide-react';
 
+// Type definitions
+interface TreeNode {
+  name: string;
+  type: 'file' | 'folder';
+  children?: TreeNode[];
+  level: number;
+  content?: string;
+  expanded?: boolean;
+}
+
 const FileTreeGenerator = () => {
   const [treeInput, setTreeInput] = useState('');
-  const [parsedTree, setParsedTree] = useState(null);
+  const [parsedTree, setParsedTree] = useState<TreeNode | null>(null);
   const [repoSettings, setRepoSettings] = useState({
     name: '',
     description: '',
@@ -18,7 +28,7 @@ const FileTreeGenerator = () => {
     projectType: 'nextjs'
   });
   const [showRepoOptions, setShowRepoOptions] = useState(false);
-  const [editingNode, setEditingNode] = useState(null);
+  const [editingNode, setEditingNode] = useState<TreeNode | null>(null);
   const [editValue, setEditValue] = useState('');
   const downloadRef = useRef(null);
 
@@ -57,10 +67,10 @@ const FileTreeGenerator = () => {
     │   └── Header.test.tsx
     └── setup.ts`;
 
-  const parseFileTree = (input: string) => {
+  const parseFileTree = (input: string): TreeNode => {
     const lines = input.trim().split('\n');
-    const root = { name: '', type: 'folder', children: [], level: -1 };
-    const stack = [root];
+    const root: TreeNode = { name: '', type: 'folder', children: [], level: -1 };
+    const stack: TreeNode[] = [root];
 
     lines.forEach(line => {
       const trimmed = line.replace(/^[│├└─\s]+/, '');
@@ -70,7 +80,7 @@ const FileTreeGenerator = () => {
       const isFolder = trimmed.endsWith('/');
       const name = isFolder ? trimmed.slice(0, -1) : trimmed;
 
-      const node = {
+      const node: TreeNode = {
         name,
         type: isFolder ? 'folder' : 'file',
         children: isFolder ? [] : undefined,
@@ -93,7 +103,7 @@ const FileTreeGenerator = () => {
       }
     });
 
-    return root.children[0] || { name: 'project', type: 'folder', children: [], level: 0 };
+    return root.children?.[0] || { name: 'project', type: 'folder', children: [], level: 0 };
   };
 
   const getDefaultContent = (filename: string) => {
@@ -400,7 +410,7 @@ temp/
     // Create a simple zip-like structure for download
     const files = [];
     
-    const collectFiles = (node: any, path: string = '') => {
+    const collectFiles = (node: TreeNode, path: string = '') => {
       const currentPath = path ? `${path}/${node.name}` : node.name;
       
       if (node.type === 'file') {
@@ -409,7 +419,7 @@ temp/
           content: node.content || getDefaultContent(node.name)
         });
       } else if (node.children) {
-        node.children.forEach(child => collectFiles(child, currentPath));
+        node.children?.forEach(child => collectFiles(child, currentPath));
       }
     };
 
@@ -511,7 +521,7 @@ Your project is configured for: **${repoSettings.projectType.toUpperCase()}**
     URL.revokeObjectURL(url);
   };
 
-  const TreeNode = ({ node, depth = 0 }: { node: any; depth?: number }) => {
+  const TreeNode = ({ node, depth = 0 }: { node: TreeNode; depth?: number }) => {
     const [expanded, setExpanded] = useState(node.expanded !== false);
     const isEditing = editingNode === node;
 
