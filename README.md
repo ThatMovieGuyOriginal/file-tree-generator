@@ -45,9 +45,10 @@ Deploy to Vercel (Recommended)
 
 Push your code to GitHub
 Connect your repository to Vercel
-Deploy with one click
+![image](https://github.com/user-attachments/assets/08f99993-fd6a-4532-a421-9113948ae931)
 
-Show Image
+Deploy with one click
+![image](https://github.com/user-attachments/assets/bcd2c81a-d055-4bb0-9d2b-cec23d57440b)
 
 Manual Deployment
 ```
