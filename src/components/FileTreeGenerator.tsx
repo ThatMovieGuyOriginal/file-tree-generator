@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Download, GitBranch, FileText, Folder, ChevronRight, ChevronDown, Plus, Trash2, Edit3, Save, X } from 'lucide-react';
+import { Download, GitBranch, FileText, Folder, ChevronRight, ChevronDown, Plus, Trash2, Edit3, Save, X, Archive, ExternalLink } from 'lucide-react';
 
 // Type definitions
 interface TreeNode {
@@ -30,6 +30,7 @@ const FileTreeGenerator = () => {
   const [showRepoOptions, setShowRepoOptions] = useState(false);
   const [editingNode, setEditingNode] = useState<TreeNode | null>(null);
   const [editValue, setEditValue] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
   const downloadRef = useRef(null);
 
   // Sample file tree for demonstration
@@ -128,8 +129,7 @@ const FileTreeGenerator = () => {
               "next": "^14.2.29",
               "react": "^18.2.0",
               "react-dom": "^18.2.0",
-              "lucide-react": "^0.263.1",
-              "typescript": "^5.2.0"
+              "lucide-react": "^0.263.1"
             },
             "devDependencies": {
               "@types/node": "^20.5.0",
@@ -139,7 +139,8 @@ const FileTreeGenerator = () => {
               "eslint-config-next": "^14.0.0",
               "tailwindcss": "^3.4.0",
               "autoprefixer": "^10.4.16",
-              "postcss": "^8.4.32"
+              "postcss": "^8.4.32",
+              "typescript": "^5.2.0"
             },
             "engines": {
               "node": ">=18.0.0"
@@ -169,6 +170,62 @@ const FileTreeGenerator = () => {
               }
             ]
           }, null, 2);
+        }
+        if (filename === 'tsconfig.json') {
+          return JSON.stringify({
+            "compilerOptions": {
+              "target": "es5",
+              "lib": ["dom", "dom.iterable", "es6"],
+              "allowJs": true,
+              "skipLibCheck": true,
+              "strict": true,
+              "noEmit": true,
+              "esModuleInterop": true,
+              "module": "esnext",
+              "moduleResolution": "bundler",
+              "resolveJsonModule": true,
+              "isolatedModules": true,
+              "jsx": "preserve",
+              "incremental": true,
+              "plugins": [{ "name": "next" }],
+              "baseUrl": ".",
+              "paths": {
+                "@/*": ["./src/*"],
+                "@/components/*": ["./src/components/*"],
+                "@/lib/*": ["./src/lib/*"],
+                "@/types/*": ["./src/types/*"]
+              }
+            },
+            "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+            "exclude": ["node_modules"]
+          }, null, 2);
+        }
+        if (filename === 'tailwind.config.js') {
+          return `/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: '#eff6ff',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+        }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+      },
+    },
+  },
+  plugins: [],
+}`;
         }
         return '{}';
       case 'tsx':
@@ -208,13 +265,164 @@ export default function RootLayout({
   )
 }`;
         }
+        if (basename.toLowerCase().includes('button')) {
+          return `interface ButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+  disabled?: boolean;
+}
+
+export const Button: React.FC<ButtonProps> = ({ 
+  children, 
+  onClick, 
+  className = '', 
+  disabled = false 
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={\`px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 \${className}\`}
+    >
+      {children}
+    </button>
+  );
+};`;
+        }
+        if (basename.toLowerCase().includes('input')) {
+          return `interface InputProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+}
+
+export const Input: React.FC<InputProps> = ({ 
+  value, 
+  onChange, 
+  placeholder = '', 
+  className = '' 
+}) => {
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className={\`px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 \${className}\`}
+    />
+  );
+};`;
+        }
+        if (basename.toLowerCase().includes('header')) {
+          return `export default function Header() {
+  return (
+    <header className="bg-white shadow-sm border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center py-6">
+          <div className="flex items-center">
+            <h1 className="text-2xl font-bold text-gray-900">
+              ${repoSettings.name || 'My App'}
+            </h1>
+          </div>
+          <nav className="flex space-x-8">
+            <a href="#" className="text-gray-500 hover:text-gray-900">
+              Home
+            </a>
+            <a href="#" className="text-gray-500 hover:text-gray-900">
+              About
+            </a>
+            <a href="#" className="text-gray-500 hover:text-gray-900">
+              Contact
+            </a>
+          </nav>
+        </div>
+      </div>
+    </header>
+  );
+}`;
+        }
+        if (basename.toLowerCase().includes('utils')) {
+          return `import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+export function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date)
+}
+
+export function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}`;
+        }
+        if (basename.toLowerCase().includes('route')) {
+          return `import { NextRequest, NextResponse } from 'next/server'
+
+export async function GET(request: NextRequest) {
+  return NextResponse.json({ 
+    message: 'Hello from ${repoSettings.name || 'My App'}!',
+    timestamp: new Date().toISOString()
+  })
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    return NextResponse.json({ 
+      success: true, 
+      data: body 
+    })
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Invalid JSON' }, 
+      { status: 400 }
+    )
+  }
+}`;
+        }
+        if (basename.toLowerCase().includes('test')) {
+          return `import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
+import ${basename.replace('.test', '')} from '../${basename.replace('.test', '')}'
+
+describe('${basename.replace('.test', '')}', () => {
+  it('renders without crashing', () => {
+    render(<${basename.replace('.test', '')} />)
+    expect(screen.getByRole('banner')).toBeInTheDocument()
+  })
+})`;
+        }
         return `// ${filename}\nexport {};`;
       case 'js':
         if (filename === 'next.config.js') {
           return `/** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  images: {
+    domains: [],
+    unoptimized: true
+  },
+  compress: true,
+}
 
 module.exports = nextConfig`;
+        }
+        if (filename === 'postcss.config.js') {
+          return `module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}`;
         }
         return `// ${filename}`;
       case 'css':
@@ -223,20 +431,53 @@ module.exports = nextConfig`;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 249, 250, 251;
+    --background-end-rgb: 255, 255, 255;
+  }
+
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgb(var(--background-end-rgb))
+      )
+      rgb(var(--background-start-rgb));
+    line-height: 1.6;
+  }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer components {
+  .btn-primary {
+    @apply bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-300 font-medium transition-colors duration-200;
+  }
+  
+  .input-field {
+    @apply w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+  }
 }`;
         }
         return `/* ${filename} */`;
@@ -248,17 +489,138 @@ ${repoSettings.description || 'A project generated with File Tree Generator'}
 
 ## Getting Started
 
+First, install the dependencies:
+
 \`\`\`bash
 npm install
-npm run dev
+# or
+yarn install
+# or
+pnpm install
 \`\`\`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.`;
+Then, run the development server:
+
+\`\`\`bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+\`\`\`
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Project Structure
+
+This project follows Next.js 14 App Router conventions with the following structure:
+
+- \`src/app/\` - App Router pages and layouts
+- \`src/components/\` - Reusable React components
+- \`src/lib/\` - Utility functions and shared logic
+- \`src/types/\` - TypeScript type definitions
+- \`public/\` - Static assets
+
+## Technologies Used
+
+- **Next.js 14** - React framework with App Router
+- **TypeScript** - Type-safe JavaScript
+- **Tailwind CSS** - Utility-first CSS framework
+- **ESLint** - Code linting and formatting
+
+## Deployment
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.`;
         }
-        return `# ${basename}`;
+        return `# ${basename}
+
+This is a markdown file for ${basename}.`;
       case 'env':
-        return `# Environment variables
-NEXT_PUBLIC_APP_NAME="${repoSettings.name || 'My App'}"`;
+      case 'local':
+        return `# Environment variables for local development
+NEXT_PUBLIC_APP_NAME="${repoSettings.name || 'My App'}"
+NEXT_PUBLIC_APP_URL="https://your-app.vercel.app"
+
+# Add your environment variables here
+# DATABASE_URL=""
+# API_KEY=""`;
+      case 'gitignore':
+        return `# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# ESLint cache
+.eslintcache
+
+# Temporary folders
+tmp/
+temp/`;
       case 'vercelignore':
         return `# Dependencies
 /node_modules
@@ -300,51 +662,15 @@ pids
 coverage/
 *.lcov
 
-# NYC test coverage
-.nyc_output
-
-# Grunt intermediate storage
-.grunt
-
-# Bower dependency directory
-bower_components
-
-# node-waf configuration
-.lock-wscript
-
-# Compiled binary addons
-build/Release
-
 # Dependency directories
 node_modules/
 jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
 
 # dotenv environment variables file
 .env
 
 # next.js build output
 .next
-
-# Nuxt.js build output
-.nuxt
-
-# vuepress build output
-.vuepress/dist
-
-# Serverless directories
-.serverless
 
 # IDE files
 .vscode/
@@ -372,25 +698,23 @@ temp/
 # Local Netlify folder
 .netlify
 
-# Storybook build outputs
-.out
-.storybook-out
-
 # Temporary folders
 tmp/
-temp/
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?`;
+temp/`;
+      case 'ico':
+        return ''; // Binary file, will be handled differently
+      case 'png':
+      case 'jpg':
+      case 'jpeg':
+      case 'gif':
+      case 'svg':
+        return ''; // Binary files, will be handled differently
       default:
-        return filename.startsWith('.') ? `# ${filename}` : `// ${filename}`;
+        if (filename.startsWith('.')) {
+          return `# ${filename} configuration file`;
+        }
+        return `// ${filename}
+// Generated by File Tree Generator`;
     }
   };
 
@@ -404,44 +728,58 @@ temp/
     }
   };
 
-  const generateZip = async () => {
+  // Enhanced ZIP generation with proper file structure
+  const generateProjectZip = async () => {
     if (!parsedTree) return;
 
-    // Create a simple zip-like structure for download
-    const files = [];
+    setIsGenerating(true);
     
-    const collectFiles = (node: TreeNode, path: string = '') => {
-      const currentPath = path ? `${path}/${node.name}` : node.name;
+    try {
+      // Import JSZip dynamically (you'll need to install it: npm install jszip)
+      const JSZip = (await import('jszip')).default;
+      const zip = new JSZip();
       
-      if (node.type === 'file') {
-        files.push({
-          path: currentPath,
-          content: node.content || getDefaultContent(node.name)
-        });
-      } else if (node.children) {
-        node.children?.forEach(child => collectFiles(child, currentPath));
+      const collectFiles = (node: TreeNode, path: string = '') => {
+        const currentPath = path ? `${path}/${node.name}` : node.name;
+        
+        if (node.type === 'file') {
+          const content = node.content || getDefaultContent(node.name);
+          zip.file(currentPath, content);
+        } else if (node.children) {
+          // Create empty folder
+          zip.folder(currentPath);
+          node.children.forEach(child => collectFiles(child, currentPath));
+        }
+      };
+
+      // Add project files
+      collectFiles(parsedTree);
+
+      // Add Vercel-specific files if requested
+      if (repoSettings.includeVercelConfig) {
+        zip.file('vercel.json', getDefaultContent('vercel.json'));
       }
-    };
 
-    collectFiles(parsedTree);
+      if (repoSettings.includeVercelIgnore) {
+        zip.file('.vercelignore', getDefaultContent('.vercelignore'));
+      }
 
-    // Add Vercel-specific files if requested
-    if (repoSettings.includeVercelConfig) {
-      files.push({
-        path: 'vercel.json',
-        content: getDefaultContent('vercel.json')
-      });
-    }
+      // Add deployment guide
+      const deploymentGuide = `# Deployment Guide for ${parsedTree.name || 'Your Project'}
 
-    if (repoSettings.includeVercelIgnore) {
-      files.push({
-        path: '.vercelignore',
-        content: getDefaultContent('.vercelignore')
-      });
-    }
+## Quick Start
 
-    // Add deployment instructions
-    const deploymentGuide = `# Deployment Guide for ${parsedTree.name || 'Your Project'}
+1. **Install dependencies:**
+   \`\`\`bash
+   npm install
+   \`\`\`
+
+2. **Start development server:**
+   \`\`\`bash
+   npm run dev
+   \`\`\`
+
+3. **Visit:** http://localhost:3000
 
 ## Vercel Deployment (Recommended)
 
@@ -458,67 +796,85 @@ temp/
    - Go to [vercel.com](https://vercel.com)
    - Click "New Project"
    - Import your GitHub repository
-   - Vercel will auto-detect the framework settings
+   - Vercel will auto-detect Next.js settings
    - Click "Deploy"
 
-3. **Environment Variables:**
-   ${repoSettings.projectType === 'nextjs' ? `
-   Add these in your Vercel dashboard if needed:
+3. **Environment Variables (if needed):**
+   Add these in your Vercel dashboard:
    - \`NEXT_PUBLIC_APP_NAME="${repoSettings.name || 'My App'}"\`
    - \`NEXT_PUBLIC_APP_URL="https://your-app.vercel.app"\`
-   ` : 'Configure any required environment variables in Vercel dashboard'}
 
-## Local Development
+## Project Configuration
 
-1. **Install dependencies:**
-   \`\`\`bash
-   npm install
-   \`\`\`
+- ✅ Next.js 14 with App Router
+- ✅ TypeScript configured
+- ✅ Tailwind CSS ready
+- ✅ ESLint setup
+${repoSettings.includeVercelConfig ? '- ✅ Vercel optimized' : '- ❌ Vercel config not included'}
+${repoSettings.includeVercelIgnore ? '- ✅ Deployment ignore rules' : '- ❌ Vercel ignore not included'}
 
-2. **Start development server:**
-   \`\`\`bash
-   npm run dev
-   \`\`\`
+## Next Steps
 
-3. **Build for production:**
-   \`\`\`bash
-   npm run build
-   \`\`\`
+1. Update the project name and description in \`package.json\`
+2. Customize the styling in \`src/app/globals.css\`
+3. Add your components in \`src/components/\`
+4. Configure environment variables in \`.env.local\`
+5. Deploy to Vercel for instant hosting
 
-## Configuration Notes
-
-${repoSettings.includeVercelConfig ? '✅ vercel.json included with optimized settings' : '❌ vercel.json not included'}
-${repoSettings.includeVercelIgnore ? '✅ .vercelignore included for clean deployments' : '❌ .vercelignore not included'}
-
-Your project is configured for: **${repoSettings.projectType.toUpperCase()}**
+Happy coding! 🚀
 `;
 
-    files.push({
-      path: 'DEPLOYMENT.md',
-      content: deploymentGuide
-    });
+      zip.file('DEPLOYMENT.md', deploymentGuide);
 
-    // Create a text file with all the files and their contents
-    let zipContent = `# Generated Project: ${parsedTree.name}\n`;
-    zipContent += `Generated on: ${new Date().toISOString()}\n`;
-    zipContent += `Project Type: ${repoSettings.projectType}\n`;
-    zipContent += `Vercel Ready: ${repoSettings.includeVercelConfig ? 'Yes' : 'No'}\n\n`;
-    zipContent += `## Files Generated (${files.length} total)\n\n`;
-    
-    files.forEach(file => {
-      zipContent += `### File: ${file.path}\n\`\`\`\n${file.content}\n\`\`\`\n\n---\n\n`;
-    });
+      // Generate the zip file
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      
+      // Create download link
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${parsedTree.name || 'project'}-complete.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+    } catch (error) {
+      console.error('Error generating ZIP:', error);
+      alert('Error generating project files. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
-    const blob = new Blob([zipContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
+  // Initialize Git repository (opens GitHub with prefilled data)
+  const initializeRepository = () => {
+    if (!parsedTree) return;
     
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${parsedTree.name || 'project'}-complete.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const repoName = repoSettings.name || parsedTree.name || 'my-project';
+    const description = repoSettings.description || 'Generated with File Tree Generator';
+    const isPrivate = repoSettings.private;
+    
+    // Create GitHub repository URL with prefilled data
+    const githubUrl = new URL('https://github.com/new');
+    githubUrl.searchParams.set('name', repoName);
+    githubUrl.searchParams.set('description', description);
+    githubUrl.searchParams.set('visibility', isPrivate ? 'private' : 'public');
+    githubUrl.searchParams.set('auto_init', 'true');
+    
+    if (repoSettings.gitignore !== 'none') {
+      githubUrl.searchParams.set('gitignore_template', repoSettings.gitignore);
+    }
+    
+    if (repoSettings.license !== 'none') {
+      githubUrl.searchParams.set('license_template', repoSettings.license);
+    }
+
+    // Open GitHub in new tab
+    window.open(githubUrl.toString(), '_blank');
+    
+    // Show instructions
+    alert(`Opening GitHub to create your repository!\n\nNext steps:\n1. Complete the repository creation on GitHub\n2. Clone the repository locally\n3. Extract your downloaded project files\n4. Copy files to your cloned repository\n5. Commit and push your changes\n\nAlternatively, you can create the repository locally with:\ngit init\ngit add .\ngit commit -m "Initial commit"`);
   };
 
   const TreeNode = ({ node, depth = 0 }: { node: TreeNode; depth?: number }) => {
@@ -810,22 +1166,42 @@ Your project is configured for: **${repoSettings.projectType.toUpperCase()}**
 
       {/* Action Buttons */}
       {parsedTree && (
-        <div className="flex gap-4 pt-6 border-t">
-          <button
-            onClick={generateZip}
-            className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 font-medium flex items-center justify-center gap-2"
-          >
-            <Download size={20} />
-            Download Project Files
-          </button>
+        <div className="space-y-4 pt-6 border-t">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              onClick={generateProjectZip}
+              disabled={isGenerating}
+              className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
+            >
+              {isGenerating ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Archive size={20} />
+                  Download Project ZIP
+                </>
+              )}
+            </button>
+            
+            <button
+              onClick={initializeRepository}
+              className="flex-1 bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 font-medium flex items-center justify-center gap-2"
+            >
+              <ExternalLink size={20} />
+              Create GitHub Repository
+            </button>
+          </div>
           
-          <button
-            onClick={() => alert('Repository initialization coming soon!')}
-            className="flex-1 bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 font-medium flex items-center justify-center gap-2"
-          >
-            <GitBranch size={20} />
-            Initialize Repository
-          </button>
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <h4 className="text-amber-800 font-medium text-sm mb-2">📦 Ready to Deploy</h4>
+            <p className="text-amber-700 text-sm">
+              Your project will include all necessary configuration files for immediate deployment to Vercel. 
+              The ZIP contains a complete, production-ready project structure.
+            </p>
+          </div>
         </div>
       )}
 
@@ -836,7 +1212,20 @@ Your project is configured for: **${repoSettings.projectType.toUpperCase()}**
           <p>1. Paste your file tree structure (or click "Load Sample" to see an example)</p>
           <p>2. Click "Parse File Tree" to generate the project structure</p>
           <p>3. Configure your project settings and options</p>
-          <p>4. Download the generated files or initialize as a Git repository</p>
+          <p>4. Download the complete project ZIP with all files and content</p>
+          <p>5. Optionally create a GitHub repository with the "Create GitHub Repository" button</p>
+        </div>
+        
+        <div className="mt-4 pt-4 border-t border-blue-200">
+          <h4 className="font-medium text-blue-900 mb-2">What you get:</h4>
+          <div className="text-blue-800 text-sm grid grid-cols-1 md:grid-cols-2 gap-1">
+            <p>✅ Complete project structure</p>
+            <p>✅ Pre-configured files with content</p>
+            <p>✅ Ready-to-run Next.js application</p>
+            <p>✅ Deployment instructions included</p>
+            <p>✅ TypeScript & Tailwind CSS setup</p>
+            <p>✅ Vercel deployment optimization</p>
+          </div>
         </div>
       </div>
     </div>
