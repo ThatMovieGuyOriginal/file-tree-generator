@@ -10,7 +10,10 @@ const FileTreeGenerator = () => {
     private: false,
     gitignore: 'node',
     license: 'MIT',
-    readme: true
+    readme: true,
+    includeVercelConfig: true,
+    includeVercelIgnore: true,
+    projectType: 'nextjs'
   });
   const [showRepoOptions, setShowRepoOptions] = useState(false);
   const [editingNode, setEditingNode] = useState(null);
@@ -100,25 +103,81 @@ const FileTreeGenerator = () => {
         if (filename === 'package.json') {
           return JSON.stringify({
             "name": repoSettings.name || "my-app",
-            "version": "0.1.0",
+            "version": "1.0.0",
             "private": true,
             "scripts": {
               "dev": "next dev",
               "build": "next build",
               "start": "next start",
-              "lint": "next lint"
+              "lint": "next lint --fix",
+              "type-check": "tsc --noEmit"
             },
             "dependencies": {
-              "next": "14.0.0",
-              "react": "^18",
-              "react-dom": "^18"
+              "next": "^14.2.29",
+              "react": "^18.2.0",
+              "react-dom": "^18.2.0",
+              "lucide-react": "^0.263.1",
+              "typescript": "^5.2.0"
             },
             "devDependencies": {
-              "@types/node": "^20",
-              "@types/react": "^18",
-              "@types/react-dom": "^18",
-              "typescript": "^5"
+              "@types/node": "^20.5.0",
+              "@types/react": "^18.2.0",
+              "@types/react-dom": "^18.2.0",
+              "eslint": "^8.50.0",
+              "eslint-config-next": "^14.0.0",
+              "tailwindcss": "^3.4.0",
+              "autoprefixer": "^10.4.16",
+              "postcss": "^8.4.32"
+            },
+            "engines": {
+              "node": ">=18.0.0"
             }
+          }, null, 2);
+        }
+        if (filename === 'vercel.json') {
+          return JSON.stringify({
+            "version": 2,
+            "build": {
+              "env": {
+                "NODE_ENV": "production"
+              }
+            },
+            "headers": [
+              {
+                "source": "/api/(.*)",
+                "headers": [
+                  {
+                    "key": "Access-Control-Allow-Origin",
+                    "value": "*"
+                  },
+                  {
+                    "key": "Access-Control-Allow-Methods",
+                    "value": "GET, POST, OPTIONS"
+                  },
+                  {
+                    "key": "Access-Control-Allow-Headers",
+                    "value": "Content-Type"
+                  }
+                ]
+              },
+              {
+                "source": "/(.*)",
+                "headers": [
+                  {
+                    "key": "X-Frame-Options",
+                    "value": "DENY"
+                  },
+                  {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                  },
+                  {
+                    "key": "Referrer-Policy",
+                    "value": "origin-when-cross-origin"
+                  }
+                ]
+              }
+            ]
           }, null, 2);
         }
         return '{}';
@@ -210,6 +269,136 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
       case 'env':
         return `# Environment variables
 NEXT_PUBLIC_APP_NAME="${repoSettings.name || 'My App'}"`;
+      case 'vercelignore':
+        return `# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+__tests__/__snapshots__
+
+# Next.js
+/.next/
+/out/
+
+# Production builds
+/build
+/dist
+
+# Environment variables
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory
+coverage/
+*.lcov
+
+# NYC test coverage
+.nyc_output
+
+# Grunt intermediate storage
+.grunt
+
+# Bower dependency directory
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons
+build/Release
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# next.js build output
+.next
+
+# Nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# Build artifacts
+*.tsbuildinfo
+
+# Local Netlify folder
+.netlify
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?`;
       default:
         return filename.startsWith('.') ? `# ${filename}` : `// ${filename}`;
     }
@@ -246,10 +435,88 @@ NEXT_PUBLIC_APP_NAME="${repoSettings.name || 'My App'}"`;
 
     collectFiles(parsedTree);
 
+    // Add Vercel-specific files if requested
+    if (repoSettings.includeVercelConfig) {
+      files.push({
+        path: 'vercel.json',
+        content: getDefaultContent('vercel.json')
+      });
+    }
+
+    if (repoSettings.includeVercelIgnore) {
+      files.push({
+        path: '.vercelignore',
+        content: getDefaultContent('.vercelignore')
+      });
+    }
+
+    // Add deployment instructions
+    const deploymentGuide = `# Deployment Guide for ${parsedTree.name || 'Your Project'}
+
+## Vercel Deployment (Recommended)
+
+1. **Push to GitHub:**
+   \`\`\`bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/yourusername/${repoSettings.name || 'your-repo'}.git
+   git push -u origin main
+   \`\`\`
+
+2. **Deploy on Vercel:**
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Import your GitHub repository
+   - Vercel will auto-detect the framework settings
+   - Click "Deploy"
+
+3. **Environment Variables:**
+   ${repoSettings.projectType === 'nextjs' ? `
+   Add these in your Vercel dashboard if needed:
+   - \`NEXT_PUBLIC_APP_NAME="${repoSettings.name || 'My App'}"\`
+   - \`NEXT_PUBLIC_APP_URL="https://your-app.vercel.app"\`
+   ` : 'Configure any required environment variables in Vercel dashboard'}
+
+## Local Development
+
+1. **Install dependencies:**
+   \`\`\`bash
+   npm install
+   \`\`\`
+
+2. **Start development server:**
+   \`\`\`bash
+   npm run dev
+   \`\`\`
+
+3. **Build for production:**
+   \`\`\`bash
+   npm run build
+   \`\`\`
+
+## Configuration Notes
+
+${repoSettings.includeVercelConfig ? '✅ vercel.json included with optimized settings' : '❌ vercel.json not included'}
+${repoSettings.includeVercelIgnore ? '✅ .vercelignore included for clean deployments' : '❌ .vercelignore not included'}
+
+Your project is configured for: **${repoSettings.projectType.toUpperCase()}**
+`;
+
+    files.push({
+      path: 'DEPLOYMENT.md',
+      content: deploymentGuide
+    });
+
     // Create a text file with all the files and their contents
-    let zipContent = `# Generated Project: ${parsedTree.name}\n\n`;
+    let zipContent = `# Generated Project: ${parsedTree.name}\n`;
+    zipContent += `Generated on: ${new Date().toISOString()}\n`;
+    zipContent += `Project Type: ${repoSettings.projectType}\n`;
+    zipContent += `Vercel Ready: ${repoSettings.includeVercelConfig ? 'Yes' : 'No'}\n\n`;
+    zipContent += `## Files Generated (${files.length} total)\n\n`;
+    
     files.forEach(file => {
-      zipContent += `## File: ${file.path}\n\`\`\`\n${file.content}\n\`\`\`\n\n`;
+      zipContent += `### File: ${file.path}\n\`\`\`\n${file.content}\n\`\`\`\n\n---\n\n`;
     });
 
     const blob = new Blob([zipContent], { type: 'text/plain' });
@@ -257,7 +524,7 @@ NEXT_PUBLIC_APP_NAME="${repoSettings.name || 'My App'}"`;
     
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${parsedTree.name || 'project'}-files.txt`;
+    a.download = `${parsedTree.name || 'project'}-complete.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -437,60 +704,114 @@ NEXT_PUBLIC_APP_NAME="${repoSettings.name || 'My App'}"`;
           </div>
 
           {showRepoOptions && (
-            <div className="grid md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  .gitignore Template
-                </label>
-                <select
-                  value={repoSettings.gitignore}
-                  onChange={(e) => setRepoSettings(prev => ({ ...prev, gitignore: e.target.value }))}
-                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="node">Node.js</option>
-                  <option value="react">React</option>
-                  <option value="next">Next.js</option>
-                  <option value="python">Python</option>
-                  <option value="none">None</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  License
-                </label>
-                <select
-                  value={repoSettings.license}
-                  onChange={(e) => setRepoSettings(prev => ({ ...prev, license: e.target.value }))}
-                  className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="MIT">MIT</option>
-                  <option value="Apache-2.0">Apache 2.0</option>
-                  <option value="GPL-3.0">GPL 3.0</option>
-                  <option value="none">None</option>
-                </select>
+            <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Project Type
+                  </label>
+                  <select
+                    value={repoSettings.projectType}
+                    onChange={(e) => setRepoSettings(prev => ({ ...prev, projectType: e.target.value }))}
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="nextjs">Next.js</option>
+                    <option value="react">React</option>
+                    <option value="node">Node.js</option>
+                    <option value="static">Static Site</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    .gitignore Template
+                  </label>
+                  <select
+                    value={repoSettings.gitignore}
+                    onChange={(e) => setRepoSettings(prev => ({ ...prev, gitignore: e.target.value }))}
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="node">Node.js</option>
+                    <option value="react">React</option>
+                    <option value="next">Next.js</option>
+                    <option value="python">Python</option>
+                    <option value="none">None</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    License
+                  </label>
+                  <select
+                    value={repoSettings.license}
+                    onChange={(e) => setRepoSettings(prev => ({ ...prev, license: e.target.value }))}
+                    className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="MIT">MIT</option>
+                    <option value="Apache-2.0">Apache 2.0</option>
+                    <option value="GPL-3.0">GPL 3.0</option>
+                    <option value="none">None</option>
+                  </select>
+                </div>
               </div>
 
-              <div className="flex items-center space-x-4 pt-6">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={repoSettings.private}
-                    onChange={(e) => setRepoSettings(prev => ({ ...prev, private: e.target.checked }))}
-                    className="mr-2"
-                  />
-                  <span className="text-sm">Private</span>
-                </label>
-                
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={repoSettings.readme}
-                    onChange={(e) => setRepoSettings(prev => ({ ...prev, readme: e.target.checked }))}
-                    className="mr-2"
-                  />
-                  <span className="text-sm">Include README</span>
-                </label>
+              <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-gray-700">Project Files</h4>
+                  <div className="space-y-2">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={repoSettings.readme}
+                        onChange={(e) => setRepoSettings(prev => ({ ...prev, readme: e.target.checked }))}
+                        className="mr-2"
+                      />
+                      <span className="text-sm">Include README.md</span>
+                    </label>
+                    
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={repoSettings.private}
+                        onChange={(e) => setRepoSettings(prev => ({ ...prev, private: e.target.checked }))}
+                        className="mr-2"
+                      />
+                      <span className="text-sm">Private Repository</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-gray-700">Vercel Deployment</h4>
+                  <div className="space-y-2">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={repoSettings.includeVercelConfig}
+                        onChange={(e) => setRepoSettings(prev => ({ ...prev, includeVercelConfig: e.target.checked }))}
+                        className="mr-2"
+                      />
+                      <span className="text-sm">Include vercel.json</span>
+                    </label>
+                    
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={repoSettings.includeVercelIgnore}
+                        onChange={(e) => setRepoSettings(prev => ({ ...prev, includeVercelIgnore: e.target.checked }))}
+                        className="mr-2"
+                      />
+                      <span className="text-sm">Include .vercelignore</span>
+                    </label>
+                  </div>
+                  
+                  {(repoSettings.includeVercelConfig || repoSettings.includeVercelIgnore) && (
+                    <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                      ✓ Optimized for Vercel deployment with proper build configuration
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
