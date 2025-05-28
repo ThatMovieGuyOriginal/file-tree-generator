@@ -57,7 +57,7 @@ const FileTreeGenerator = () => {
     │   └── Header.test.tsx
     └── setup.ts`;
 
-  const parseFileTree = (input) => {
+  const parseFileTree = (input: string) => {
     const lines = input.trim().split('\n');
     const root = { name: '', type: 'folder', children: [], level: -1 };
     const stack = [root];
@@ -96,7 +96,7 @@ const FileTreeGenerator = () => {
     return root.children[0] || { name: 'project', type: 'folder', children: [], level: 0 };
   };
 
-  const getDefaultContent = (filename) => {
+  const getDefaultContent = (filename: string) => {
     const ext = filename.split('.').pop()?.toLowerCase();
     const basename = filename.split('.')[0];
 
@@ -138,30 +138,8 @@ const FileTreeGenerator = () => {
         }
         if (filename === 'vercel.json') {
           return JSON.stringify({
-            "version": 2,
-            "build": {
-              "env": {
-                "NODE_ENV": "production"
-              }
-            },
+            "framework": "nextjs",
             "headers": [
-              {
-                "source": "/api/(.*)",
-                "headers": [
-                  {
-                    "key": "Access-Control-Allow-Origin",
-                    "value": "*"
-                  },
-                  {
-                    "key": "Access-Control-Allow-Methods",
-                    "value": "GET, POST, OPTIONS"
-                  },
-                  {
-                    "key": "Access-Control-Allow-Headers",
-                    "value": "Content-Type"
-                  }
-                ]
-              },
               {
                 "source": "/(.*)",
                 "headers": [
@@ -422,7 +400,7 @@ temp/
     // Create a simple zip-like structure for download
     const files = [];
     
-    const collectFiles = (node, path = '') => {
+    const collectFiles = (node: any, path: string = '') => {
       const currentPath = path ? `${path}/${node.name}` : node.name;
       
       if (node.type === 'file') {
@@ -533,7 +511,7 @@ Your project is configured for: **${repoSettings.projectType.toUpperCase()}**
     URL.revokeObjectURL(url);
   };
 
-  const TreeNode = ({ node, depth = 0 }) => {
+  const TreeNode = ({ node, depth = 0 }: { node: any; depth?: number }) => {
     const [expanded, setExpanded] = useState(node.expanded !== false);
     const isEditing = editingNode === node;
 
