@@ -28,42 +28,44 @@ git clone https://github.com/yourusername/file-tree-generator.git
 cd file-tree-generator
 ```
 
-Install dependencies:
+2. Install dependencies:
 ```
 bashnpm install
 ```
 
-Start the development server:
+3. Start the development server:
 ```
 bashnpm run dev
 ```
 
 Open http://localhost:3000 in your browser.
 
-Deployment
+## Deployment
 Deploy to Vercel (Recommended)
 
 Push your code to GitHub
 Connect your repository to Vercel
+
 ![image](https://github.com/user-attachments/assets/08f99993-fd6a-4532-a421-9113948ae931)
 
-Deploy with one click
+### Deploy with one click
 ![image](https://github.com/user-attachments/assets/bcd2c81a-d055-4bb0-9d2b-cec23d57440b)
 
-Manual Deployment
+### Manual Deployment
 ```
 bashnpm run build
 npm start
 ```
 
-Usage
+## Usage
 
 Input File Tree: Paste your file tree structure (from tree command or manual creation)
 Parse Structure: Click "Parse File Tree" to generate the interactive preview
 Configure Project: Set project name, description, and advanced options
+
 Export: Download your complete project files
 
-Example File Tree Input
+## Example File Tree Input
 ```
 my-nextjs-app/
 ├── package.json
@@ -80,7 +82,7 @@ my-nextjs-app/
     └── favicon.ico
 ```
     
-Technology Stack
+## Technology Stack
 
 Frontend: Next.js 14, React 18, TypeScript
 Styling: Tailwind CSS
@@ -88,17 +90,18 @@ Icons: Lucide React
 Deployment: Vercel
 Development: ESLint, PostCSS
 
-Contributing
+## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-Fork the project
+## Fork the project
 Create your feature branch (git checkout -b feature/AmazingFeature)
 Commit your changes (git commit -m 'Add some AmazingFeature')
 Push to the branch (git push origin feature/AmazingFeature)
 Open a Pull Request
 
-License
+## License
 This project is licensed under the MIT License - see the LICENSE file for details.
-Support
+
+## Support
 If you find this project helpful, please consider giving it a ⭐ on GitHub!
 For questions or support, please open an issue on GitHub.
