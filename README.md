@@ -26,14 +26,17 @@ Transform your file structures into complete projects with intelligent content g
 ```bash
 git clone https://github.com/yourusername/file-tree-generator.git
 cd file-tree-generator
+```
 
 Install dependencies:
-
+```
 bashnpm install
+```
 
 Start the development server:
-
+```
 bashnpm run dev
+```
 
 Open http://localhost:3000 in your browser.
 
@@ -45,9 +48,13 @@ Connect your repository to Vercel
 Deploy with one click
 
 Show Image
+
 Manual Deployment
+```
 bashnpm run build
 npm start
+```
+
 Usage
 
 Input File Tree: Paste your file tree structure (from tree command or manual creation)
