@@ -138,6 +138,7 @@ const FileTreeGenerator = () => {
             showAdvanced={showAdvancedOptions}
             onToggleAdvanced={() => setShowAdvancedOptions(!showAdvancedOptions)}
             selectedPlugin={selectedPlugin}
+            availablePlugins={availablePlugins}
           />
 
           <ProjectActions
@@ -145,7 +146,6 @@ const FileTreeGenerator = () => {
             settings={projectSettings}
             isGenerating={isGenerating}
             onGeneratingChange={setIsGenerating}
-            selectedPlugin={selectedPlugin}
           />
         </>
       )}
