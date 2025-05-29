@@ -11,7 +11,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:templates": "vitest run tests/template-manager.test.ts",
+    "test:deployment": "vitest run tests/deployment-manager.test.ts",
+    "test:integration": "vitest run tests/integration/",
+    "test:e2e": "vitest run tests/e2e/"
   },
   "dependencies": {
     "next": "14.2.5",
