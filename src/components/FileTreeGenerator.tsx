@@ -1,4 +1,4 @@
-// src/components/FileTreeGenerator.tsx (Updated with Plugin System)
+// src/components/FileTreeGenerator.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
