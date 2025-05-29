@@ -63,68 +63,6 @@ export const sampleFileTree = `my-nextjs-app/
     ├── lib/
     │   └── utils.test.ts
     └── setup.ts`;
-├── package.json
-├── next.config.js
-├── tailwind.config.js
-├── tsconfig.json
-├── .env.local
-├── .gitignore
-├── README.md
-├── public/
-│   ├── favicon.ico
-│   └── images/
-│       └── logo.png
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   ├── globals.css
-│   │   ├── loading.tsx
-│   │   ├── error.tsx
-│   │   └── api/
-│   │       ├── hello/
-│   │       │   └── route.ts
-│   │       └── auth/
-│   │           └── route.ts
-│   ├── components/
-│   │   ├── ui/
-│   │   │   ├── button.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── card.tsx
-│   │   │   └── modal.tsx
-│   │   ├── layout/
-│   │   │   ├── Header.tsx
-│   │   │   ├── Footer.tsx
-│   │   │   └── Sidebar.tsx
-│   │   └── features/
-│   │       ├── auth/
-│   │       │   ├── LoginForm.tsx
-│   │       │   └── SignupForm.tsx
-│   │       └── dashboard/
-│   │           ├── Dashboard.tsx
-│   │           └── Stats.tsx
-│   ├── lib/
-│   │   ├── utils.ts
-│   │   ├── auth.ts
-│   │   ├── api.ts
-│   │   └── validations.ts
-│   ├── hooks/
-│   │   ├── useAuth.ts
-│   │   ├── useLocalStorage.ts
-│   │   └── useApi.ts
-│   ├── types/
-│   │   ├── index.ts
-│   │   ├── auth.ts
-│   │   └── api.ts
-│   └── styles/
-│       └── components.css
-└── tests/
-    ├── components/
-    │   ├── Header.test.tsx
-    │   └── Button.test.tsx
-    ├── lib/
-    │   └── utils.test.ts
-    └── setup.ts`;
 
 export const sampleReactTree = `my-react-app/
 ├── package.json
