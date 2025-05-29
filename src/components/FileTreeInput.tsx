@@ -1,4 +1,4 @@
-// src/components/FileTreeInput.tsx
+// src/components/FileTreeInput.tsx (full refactor)
 'use client';
 
 import React from 'react';
