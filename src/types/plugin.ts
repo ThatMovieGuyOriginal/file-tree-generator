@@ -1,4 +1,7 @@
 // src/types/plugin.ts
+import { TreeNode } from './fileTree';
+import { ProjectSettings } from './project';
+
 export interface LanguagePlugin {
   id: string;
   name: string;
