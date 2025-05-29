@@ -2,29 +2,51 @@
 'use client';
 
 import React from 'react';
-import { sampleFileTree } from '@/lib/sampleData';
+import { LanguagePlugin } from '@/types/plugin';
+import { getSampleByType } from '@/lib/sampleData';
 
 interface FileTreeInputProps {
   treeInput: string;
   setTreeInput: (value: string) => void;
   onParseTree: () => void;
+  selectedPlugin?: string;
+  availablePlugins?: LanguagePlugin[];
 }
 
 export const FileTreeInput: React.FC<FileTreeInputProps> = ({
   treeInput,
   setTreeInput,
-  onParseTree
+  onParseTree,
+  selectedPlugin,
+  availablePlugins = []
 }) => {
+  const currentPlugin = availablePlugins.find(plugin => plugin.id === selectedPlugin);
+  
+  const loadSampleTree = () => {
+    if (currentPlugin) {
+      setTreeInput(currentPlugin.sampleTree);
+    } else {
+      // Fallback to default sample
+      setTreeInput(getSampleByType('nextjs'));
+    }
+  };
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">File Tree Input</h2>
-        <button
-          onClick={() => setTreeInput(sampleFileTree)}
-          className="text-sm text-blue-600 hover:text-blue-800 underline"
-        >
-          Load Sample
-        </button>
+        <div className="flex items-center gap-3">
+          {currentPlugin && (
+            <span className="text-sm text-gray-600">
+              {currentPlugin.name} Template
+            </span>
+          )}
+          <button
+            onClick={loadSampleTree}
+            className="text-sm text-blue-600 hover:text-blue-800 underline"
+          >
+            Load Sample
+          </button>
+        </div>
       </div>
       
       <textarea
