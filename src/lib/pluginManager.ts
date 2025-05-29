@@ -148,7 +148,7 @@ class PluginManager {
       plugin.id &&
       plugin.name &&
       plugin.extensions?.length &&
-      plugin.generateContent &&
+      typeof plugin.generateContent === 'function' &&
       plugin.sampleTree
     );
   }
