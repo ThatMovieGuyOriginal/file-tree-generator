@@ -1,9 +1,11 @@
 // src/lib/preview-templates/index.ts
-export { generateSaaSPreview } from './saas-preview';
-export { generateEcommercePreview } from './ecommerce-preview';
-export { generateDashboardPreview } from './dashboard-preview';
-export { generateBlogPreview } from './blog-preview';
-export { generateAPIPreview } from './api-preview';
+import { generateSaaSPreview } from './saas-preview';
+import { generateEcommercePreview } from './ecommerce-preview';
+import { generateDashboardPreview } from './dashboard-preview';
+import { generateBlogPreview } from './blog-preview';
+import { generateAPIPreview } from './api-preview';
+
+export { generateSaaSPreview, generateEcommercePreview, generateDashboardPreview, generateBlogPreview, generateAPIPreview };
 
 export const getPreviewTemplate = (template: string): string => {
   switch (template) {
