@@ -1,4 +1,4 @@
-/ src/lib/utils/deployment-utils.ts
+// src/lib/utils/deployment-utils.ts
 import { DeploymentPlatform } from '@/lib/deployment-manager';
 
 export const getDeploymentUrl = (platform: DeploymentPlatform['id'], projectName: string): string => {
