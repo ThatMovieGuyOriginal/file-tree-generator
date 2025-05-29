@@ -425,7 +425,7 @@ Your app will be available at: \`https://amazing-site-name.netlify.app\``;
 1. **Install CLI:**
    \`\`\`bash
    npm install -g @railway/cli
-   \`\`\```
+   \`\`\`
 
 2. **Login and Deploy:**
    \`\`\`bash
