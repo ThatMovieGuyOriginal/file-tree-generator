@@ -1,4 +1,4 @@
-// src/components/preview/DeviceSelector.tsx
+// src/steps/step-3-preview/components/DeviceSelector.tsx
 import React from 'react';
 import { Monitor, Tablet, Smartphone } from 'lucide-react';
 import { DeviceMode } from './LivePreview';
