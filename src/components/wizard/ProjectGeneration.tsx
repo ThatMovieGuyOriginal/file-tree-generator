@@ -1,6 +1,6 @@
 // src/components/wizard/ProjectGeneration.tsx
 import React from 'react';
-import { Loader2, Check, Sparkles } from 'lucide-react';
+import { ProjectGeneration as ProjectGenerationStep } from '@/steps/step-4-generation/components/ProjectGeneration';
 
 interface ProjectGenerationProps {
   isGenerating: boolean;
