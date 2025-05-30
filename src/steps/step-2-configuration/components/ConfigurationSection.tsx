@@ -1,4 +1,4 @@
-// src/components/wizard/ConfigurationSection.tsx
+// src/steps/step-2-configuration/components/ConfigurationSection.tsx
 import React from 'react';
 import { Check } from 'lucide-react';
 
