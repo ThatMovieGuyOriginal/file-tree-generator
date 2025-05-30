@@ -279,6 +279,10 @@ const FileTreeGenerator = () => {
             <ProjectGeneration
               isGenerating={isGenerating}
               onGenerate={handleGenerate}
+              generatedProject={generatedProject}
+              settings={projectSettings}
+              onDeploy={handleDeploy}
+              onDownload={handleDownload}
             />
           )}
 
