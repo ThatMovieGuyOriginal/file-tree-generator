@@ -3,7 +3,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { ProjectSettings } from '@/types/project';
-import { EnhancedLanguagePlugin, PluginConfiguration, DependencyOption } from '@/types/enhanced-plugin';
+import { EnhancedLanguagePlugin } from '@/types/enhanced-plugin';
+import { PluginConfiguration, DependencyOption } from '@/types/enhanced-plugin';
 import { Check } from 'lucide-react';
 
 interface DynamicConfigurationProps {
