@@ -1,4 +1,4 @@
-// src/components/wizard/TemplateCard.tsx
+// src/steps/step-1-template-selection/components/TemplateCard.tsx
 import React from 'react';
 import { Check } from 'lucide-react';
 import { Template } from '@/lib/template-manager';
