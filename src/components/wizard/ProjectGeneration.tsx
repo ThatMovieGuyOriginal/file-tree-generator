@@ -1,4 +1,4 @@
-// src/steps/step-4-generation/components/ProjectGeneration.tsx
+// src/components/wizard/ProjectGeneration.tsx
 import React from 'react';
 import { Loader2, Check, Sparkles } from 'lucide-react';
 
