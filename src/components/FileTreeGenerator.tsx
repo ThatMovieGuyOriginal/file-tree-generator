@@ -1,4 +1,4 @@
-// src/steps/step-1-template-selection/components/TemplateSelection.tsx
+// src/components/FileTreeGenerator.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
