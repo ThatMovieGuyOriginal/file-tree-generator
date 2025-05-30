@@ -1,4 +1,4 @@
-// src/components/preview/LivePreview.tsx
+// src/steps/step-3-preview/components/LivePreview.tsx
 import React, { useState } from 'react';
 import { Eye, ExternalLink } from 'lucide-react';
 import { Template } from '@/lib/template-manager';
