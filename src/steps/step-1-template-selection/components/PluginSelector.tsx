@@ -1,4 +1,4 @@
-// src/components/PluginSelector.tsx
+// src/steps/step-1-template-selection/components/PluginSelector.tsx
 'use client';
 
 import React from 'react';
