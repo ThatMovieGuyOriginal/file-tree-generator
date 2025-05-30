@@ -1,4 +1,4 @@
-// src/components/DynamicConfiguration.tsx
+// src/steps/step-2-configuration/components/DynamicConfiguration.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
