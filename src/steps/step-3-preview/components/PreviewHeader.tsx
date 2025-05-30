@@ -1,4 +1,4 @@
-// src/components/preview/PreviewHeader.tsx
+// src/steps/step-3-preview/components/PreviewHeader.tsx
 import React from 'react';
 import { Download } from 'lucide-react';
 import { ProjectSettings } from '@/types/project';
