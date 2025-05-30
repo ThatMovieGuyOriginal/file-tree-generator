@@ -1,4 +1,4 @@
-// src/components/preview/StructureView.tsx
+// src/steps/step-3-preview/components/StructureView.tsx
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown, FileText, Folder } from 'lucide-react';
 import { TreeNode } from '@/types/fileTree';
