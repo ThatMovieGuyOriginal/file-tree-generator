@@ -1,4 +1,4 @@
-// src/components/wizard/TemplateSelection.tsx
+// src/steps/step-1-template-selection/components/TemplateSelection.tsx
 import React from 'react';
 import { Template } from '@/lib/template-manager';
 import { TemplateCard } from './TemplateCard';
