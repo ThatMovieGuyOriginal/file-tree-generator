@@ -1,4 +1,4 @@
-// src/components/preview/PreviewFooter.tsx
+// src/steps/step-3-preview/components/PreviewFooter.tsx
 import React from 'react';
 import { Shield } from 'lucide-react';
 import { ProjectSettings } from '@/types/project';
