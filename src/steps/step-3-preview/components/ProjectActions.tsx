@@ -1,4 +1,4 @@
-// src/components/ProjectActions.tsx
+// src/steps/step-3-preview/components/ProjectActions.tsx
 'use client';
 
 import React, { useState } from 'react';
