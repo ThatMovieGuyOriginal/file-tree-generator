@@ -1,4 +1,4 @@
-// src/components/preview/DeploymentView.tsx
+// src/steps/step-3-preview/components/DeploymentView.tsx
 import React from 'react';
 import { Play, Zap } from 'lucide-react';
 import { Template } from '@/lib/template-manager';
