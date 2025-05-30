@@ -1,4 +1,4 @@
-// src/components/preview/TemplateFeatures.tsx
+// src/steps/step-3-preview/components/TemplateFeatures.tsx
 import React from 'react';
 import { Shield, Database, Palette, Zap } from 'lucide-react';
 import { Template } from '@/lib/template-manager';
