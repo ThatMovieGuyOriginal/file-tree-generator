@@ -1,4 +1,4 @@
-// src/components/TreePreview.tsx
+// src/steps/step-3-preview/components/TreePreview.tsx
 'use client';
 
 import React, { useState } from 'react';
