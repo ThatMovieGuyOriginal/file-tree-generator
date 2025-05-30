@@ -1,4 +1,4 @@
-// src/components/preview/FileContent.tsx
+// src/steps/step-3-preview/components/FileContent.tsx
 import React from 'react';
 import { FileText } from 'lucide-react';
 
