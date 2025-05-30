@@ -1,8 +1,7 @@
 // src/components/wizard/ProjectConfiguration.tsx
 import React from 'react';
-import { Database, Shield, Palette, TestTube } from 'lucide-react';
 import { ProjectSettings } from '@/types/project';
-import { ConfigurationSection } from './ConfigurationSection';
+import { ProjectConfiguration as ProjectConfigurationStep } from '@/steps/step-2-configuration/components/ProjectConfiguration';
 
 interface ProjectConfigurationProps {
   settings: ProjectSettings;
