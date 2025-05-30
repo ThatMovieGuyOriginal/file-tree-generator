@@ -1,10 +1,22 @@
 // src/components/wizard/ProjectGeneration.tsx
 import React from 'react';
 import { ProjectGeneration as ProjectGenerationStep } from '@/steps/step-4-generation/components/ProjectGeneration';
+import { TreeNode } from '@/types/fileTree';
+import { ProjectSettings } from '@/types/project';
+import { Template } from '@/lib/template-manager';
+import { DeploymentPlatform } from '@/lib/deployment-manager';
 
 interface ProjectGenerationProps {
   isGenerating: boolean;
   onGenerate: () => void;
+  generatedProject?: {
+    tree: TreeNode;
+    files: Record<string, string>;
+    template: Template;
+  } | null;
+  settings?: ProjectSettings;
+  onDeploy?: (platform: DeploymentPlatform['id']) => void;
+  onDownload?: () => void;
 }
 
 export const ProjectGeneration: React.FC<ProjectGenerationProps> = ({
