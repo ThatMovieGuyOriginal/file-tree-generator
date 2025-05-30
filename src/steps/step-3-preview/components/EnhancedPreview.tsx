@@ -1,4 +1,4 @@
-// src/components/preview/EnhancedPreview.tsx
+// src/steps/step-3-preview/components/EnhancedPreview.tsx
 'use client';
 
 import React, { useState } from 'react';
