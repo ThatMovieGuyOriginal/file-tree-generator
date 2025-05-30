@@ -1,4 +1,4 @@
-// src/components/preview/PreviewTabs.tsx
+// ssrc/steps/step-3-preview/components/PreviewTabs.tsx
 import React from 'react';
 import { Folder, Code, Eye, Settings } from 'lucide-react';
 import { PreviewTab } from './EnhancedPreview';
