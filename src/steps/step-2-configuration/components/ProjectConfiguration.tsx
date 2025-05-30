@@ -1,4 +1,4 @@
-// src/components/ProjectConfiguration.tsx
+// src/steps/step-2-configuration/components/ProjectConfiguration.tsx
 'use client';
 
 import React from 'react';
