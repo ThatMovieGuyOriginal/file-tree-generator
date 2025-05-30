@@ -1,4 +1,4 @@
-// src/components/preview/FilesView.tsx
+// src/steps/step-3-preview/components/FilesView.tsx
 import React, { useState } from 'react';
 import { FileText } from 'lucide-react';
 import { FileList } from './FileList';
