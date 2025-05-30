@@ -1,4 +1,4 @@
-// src/app/api/preview/route.ts
+// src/steps/step-3-preview/app/api/preview/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getPreviewTemplate } from '@/lib/preview-templates';
 
