@@ -1,4 +1,4 @@
-// src/components/FileTreeGenerator.tsx - CORRECTED IMPORTS AND ICON FIXES
+// src/components/FileTreeGenerator.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
