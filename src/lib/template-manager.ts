@@ -1,6 +1,8 @@
 // src/lib/template-manager.ts
 import { ProjectSettings } from '@/types/project';
 import { TreeNode } from '@/types/fileTree';
+import { pluginManager } from './pluginManager';
+import { enhancedPluginManager } from './enhanced-plugin-manager';
 
 export interface Template {
   id: string;
@@ -159,16 +161,42 @@ export class TemplateManager {
     settings: ProjectSettings,
     customConfigurations?: Record<string, any>
   ): { tree: TreeNode; files: Record<string, string> } {
-    const template = this.getTemplate(templateId);
-    if (!template) {
-      throw new Error(`Template ${templateId} not found`);
+    // Enhanced error handling
+    if (!templateId) {
+      throw new Error('Template ID is required');
     }
 
-    const tree = this.parseStructureToTree(template.structure, settings.name || 'my-project');
-    const files = this.generateTemplateFiles(template, settings, customConfigurations);
+    const template = this.getTemplate(templateId);
+    if (!template) {
+      const availableTemplates = Array.from(this.templates.keys()).join(', ');
+      throw new Error(`Template '${templateId}' not found. Available templates: ${availableTemplates}`);
+    }
 
-    return { tree, files };
+    // Validate settings
+    if (!settings.name || settings.name.trim() === '') {
+      throw new Error('Project name is required');
+    }
+
+    // Validate project name format
+    if (!/^[a-zA-Z0-9-_]+$/.test(settings.name)) {
+      throw new Error('Project name must contain only letters, numbers, hyphens, and underscores');
+    }
+
+    try {
+      const tree = this.parseStructureToTree(template.structure, settings.name);
+      
+      // Use plugin manager for enhanced content generation
+      const files = this.generateTemplateFilesWithPlugins(template, settings, customConfigurations);
+
+      return { tree, files };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Failed to generate project: ${error.message}`);
+      }
+      throw new Error('Unknown error occurred during project generation');
+    }
   }
+
 
   private parseStructureToTree(structure: string, projectName: string): TreeNode {
     const lines = structure.trim().split('\n');
@@ -312,6 +340,56 @@ export class TemplateManager {
     └── setup.ts`;
   }
 
+  private generateTemplateFilesWithPlugins(
+    template: Template,
+    settings: ProjectSettings,
+    customConfigurations?: Record<string, any>
+  ): Record<string, string> {
+    const files: Record<string, string> = {};
+    const config = { ...template.stack, ...customConfigurations };
+
+    try {
+      // Initialize plugin manager if not already done
+      if (!pluginManager.getAllPlugins().length) {
+        console.warn('Plugin manager not initialized, falling back to basic generation');
+      }
+
+      // Use plugin manager for file generation where applicable
+      const selectedPlugin = config.selectedPlugin || settings.projectType;
+      const plugin = pluginManager.getPlugin(selectedPlugin);
+
+      // Generate package.json with plugin-aware dependencies
+      files['package.json'] = this.generateEnhancedPackageJson(template, settings, config, plugin);
+      
+      // Generate configuration files
+      if (config.framework === 'nextjs') {
+        files['next.config.js'] = this.generateNextConfig(template);
+        files['tsconfig.json'] = this.generateTsConfig();
+      }
+
+      if (config.styling === 'tailwind') {
+        files['tailwind.config.js'] = this.generateTailwindConfig();
+        files['postcss.config.js'] = this.generatePostCSSConfig();
+      }
+
+      // Generate core application files using plugin system
+      const coreFiles = this.generateCoreFilesWithPlugin(template, settings, config, plugin);
+      Object.assign(files, coreFiles);
+
+      // Generate common files
+      files['.env.local'] = this.generateEnvFile(template, settings);
+      files['README.md'] = this.generateReadme(template, settings);
+      files['.gitignore'] = this.generateGitignore();
+
+      // Validate generated files
+      this.validateGeneratedFiles(files);
+
+      return files;
+    } catch (error) {
+      throw new Error(`File generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+  
   private getEcommerceStructure(): string {
     return `my-store/
 ├── package.json
@@ -451,6 +529,153 @@ export class TemplateManager {
     }, null, 2);
   }
 
+  private generateEnhancedPackageJson(
+    template: Template,
+    settings: ProjectSettings,
+    config: any,
+    plugin?: any
+  ): string {
+    const baseDeps = {
+      next: '^14.2.29',
+      react: '^18.2.0',
+      'react-dom': '^18.2.0'
+    };
+
+    const templateDeps: Record<string, string> = {};
+
+    // Add plugin-specific dependencies
+    if (plugin?.dependencies?.runtime) {
+      plugin.dependencies.runtime.forEach((dep: string) => {
+        const [name, version] = dep.split('@');
+        templateDeps[name] = version || 'latest';
+      });
+    }
+
+    // Add template-specific dependencies
+    if (template.features.includes('Authentication')) {
+      templateDeps['next-auth'] = '^4.24.0';
+    }
+    if (template.features.includes('Stripe Payments')) {
+      templateDeps['stripe'] = '^14.0.0';
+      templateDeps['@stripe/stripe-js'] = '^2.0.0';
+    }
+    if (template.stack.database === 'prisma') {
+      templateDeps['@prisma/client'] = '^5.0.0';
+    }
+
+    const devDeps: Record<string, string> = {
+      '@types/node': '^20.5.0',
+      '@types/react': '^18.2.0',
+      'typescript': '^5.2.0',
+      'tailwindcss': '^3.4.0'
+    };
+
+    // Add plugin dev dependencies
+    if (plugin?.dependencies?.devDependencies) {
+      plugin.dependencies.devDependencies.forEach((dep: string) => {
+        const [name, version] = dep.split('@');
+        devDeps[name] = version || 'latest';
+      });
+    }
+
+    return JSON.stringify({
+      name: settings.name.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+      version: '0.1.0',
+      private: true,
+      scripts: {
+        dev: 'next dev',
+        build: 'next build',
+        start: 'next start',
+        lint: 'next lint',
+        'type-check': 'tsc --noEmit',
+        ...(config.database === 'prisma' && {
+          'db:generate': 'prisma generate',
+          'db:push': 'prisma db push'
+        })
+      },
+      dependencies: { ...baseDeps, ...templateDeps },
+      devDependencies: devDeps
+    }, null, 2);
+  }
+
+  private generateCoreFilesWithPlugin(
+    template: Template,
+    settings: ProjectSettings,
+    config: any,
+    plugin?: any
+  ): Record<string, string> {
+    const files: Record<string, string> = {};
+
+    // Use plugin for file generation if available
+    if (plugin) {
+      const commonFiles = [
+        'src/app/layout.tsx',
+        'src/app/page.tsx',
+        'src/components/ui/button.tsx',
+        'src/lib/utils.ts'
+      ];
+
+      commonFiles.forEach(filePath => {
+        const fileName = filePath.split('/').pop() || '';
+        try {
+          files[filePath] = plugin.generateContent(fileName, settings);
+        } catch (error) {
+          console.warn(`Plugin failed to generate ${filePath}, using fallback`);
+          files[filePath] = this.generateFallbackContent(filePath, settings);
+        }
+      });
+    }
+
+    // Generate template-specific files
+    switch (template.category) {
+      case 'saas':
+        Object.assign(files, this.generateSaaSFiles(settings, config));
+        break;
+      case 'ecommerce':
+        Object.assign(files, this.generateEcommerceFiles(settings, config));
+        break;
+      case 'dashboard':
+        Object.assign(files, this.generateDashboardFiles(settings, config));
+        break;
+      case 'blog':
+        Object.assign(files, this.generateBlogFiles(settings, config));
+        break;
+    }
+
+    return files;
+  }
+
+  private generateFallbackContent(filePath: string, settings: ProjectSettings): string {
+    const fileName = filePath.split('/').pop() || '';
+    return `// ${fileName}\n// Generated by File Tree Generator\n// Fallback content for ${settings.name}\n\nexport default function ${fileName.split('.')[0]}() {\n  return <div>Generated content</div>;\n}`;
+  }
+
+  private validateGeneratedFiles(files: Record<string, string>): void {
+    const requiredFiles = ['package.json', 'README.md'];
+    
+    for (const required of requiredFiles) {
+      if (!files[required]) {
+        throw new Error(`Required file '${required}' was not generated`);
+      }
+    }
+
+    // Validate package.json is valid JSON
+    try {
+      JSON.parse(files['package.json']);
+    } catch {
+      throw new Error('Generated package.json is not valid JSON');
+    }
+
+    // Check for empty files
+    const emptyFiles = Object.entries(files)
+      .filter(([_, content]) => !content.trim())
+      .map(([path, _]) => path);
+    
+    if (emptyFiles.length > 0) {
+      console.warn(`Generated empty files: ${emptyFiles.join(', ')}`);
+    }
+  }
+  
   private generateSaaSFiles(settings: ProjectSettings, config: StackConfiguration): Record<string, string> {
     return {
       'src/app/page.tsx': `export default function Home() {
