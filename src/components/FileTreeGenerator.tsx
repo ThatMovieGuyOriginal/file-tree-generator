@@ -3,21 +3,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Settings, Eye, Rocket, Database, Shield, Palette, TestTube, Check, Loader2 } from 'lucide-react';
-import { TreeNode as TreeNodeType } from '@/types/fileTree';
-import { ProjectSettings } from '@/types/project';
-import { templateManager, Template } from '@/lib/template-manager';
-import { deploymentManager, DeploymentPlatform } from '@/lib/deployment-manager';
-import { pluginManager } from '@/lib/pluginManager';
-import { EnhancedPreview } from '@/steps/step-3-preview/components/EnhancedPreview';
+import { TreeNode as TreeNodeType } from 'src/types/fileTree';
+import { ProjectSettings } from 'src/types/project';
+import { templateManager, Template } from 'src/lib/template-manager';
+import { deploymentManager, DeploymentPlatform } from 'src/lib/deployment-manager';
+import { pluginManager } from 'src/lib/pluginManager';
+import { EnhancedPreview } from 'src/steps/step-3-preview/components/EnhancedPreview';
 import { WizardHeader } from './wizard/WizardHeader';
 import { WizardNavigation } from './wizard/WizardNavigation';
 import { WizardStep } from './wizard/WizardStep';
-import { TemplateSelection } from '@/steps/step-1-template-selection/components/TemplateSelection';
-import { ProjectConfiguration } from '@/steps/step-2-configuration/components/ProjectConfiguration';
+import { TemplateSelection } from 'src/steps/step-1-template-selection/components/TemplateSelection';
+import { ProjectConfiguration } from 'src/steps/step-2-configuration/components/ProjectConfiguration';
 import { ProjectPreview } from './wizard/ProjectPreview';
-import { ProjectGeneration } from '@/steps/step-4-generation/components/ProjectGeneration';
-import { getDeploymentUrl } from '@/lib/utils/deployment-utils';
-import { getPreviewTemplate } from '@/lib/preview-templates';
+import { ProjectGeneration } from 'src/steps/step-4-generation/components/ProjectGeneration';
+import { getDeploymentUrl } from 'src/lib/utils/deployment-utils';
+import { getPreviewTemplate } from 'src/lib/preview-templates';
 
 // Initialize plugin manager on component mount
 const FileTreeGenerator = () => {
