@@ -1,4 +1,4 @@
-// src/components/FileTreeGenerator.tsx - updated
+// src/components/FileTreeGenerator.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -12,10 +12,10 @@ import { EnhancedPreview } from 'src/steps/step-3-preview/components/EnhancedPre
 import { WizardHeader } from './wizard/WizardHeader';
 import { WizardNavigation } from './wizard/WizardNavigation';
 import { WizardStep } from './wizard/WizardStep';
-import { TemplateSelection } from 'src/steps/step-1-template-selection/components/TemplateSelection';
-import { ProjectConfiguration } from 'src/steps/step-2-configuration/components/ProjectConfiguration';
+import { TemplateSelection } from './wizard/TemplateSelection';
+import { ProjectConfiguration } from './wizard/ProjectConfiguration';
 import { ProjectPreview } from './wizard/ProjectPreview';
-import { ProjectGeneration } from 'src/steps/step-4-generation/components/ProjectGeneration';
+import { ProjectGeneration } from './wizard/ProjectGeneration';
 import { getDeploymentUrl } from 'src/lib/utils/deployment-utils';
 import { getPreviewTemplate } from 'src/lib/preview-templates';
 
