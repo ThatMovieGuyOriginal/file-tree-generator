@@ -50,7 +50,8 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/signin',
-    signUp: '/auth/signup',
+    // Remove signUp - it's not a valid NextAuth page option
+    // If you need a custom signup page, handle it separately in your app
   },
   session: {
     strategy: 'jwt',
