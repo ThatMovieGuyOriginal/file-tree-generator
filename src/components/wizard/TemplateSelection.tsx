@@ -1,7 +1,7 @@
 // src/components/wizard/TemplateSelection.tsx
 import React from 'react';
 import { Template } from '@/lib/template-manager';
-import { TemplateSelection as TemplateSelectionStep } from '@/steps/step-1-template-selection/components/TemplateSelection';
+import { TemplateCard } from '@/steps/step-1-template-selection/components/TemplateCard';
 
 interface TemplateSelectionProps {
   templates: Template[];
