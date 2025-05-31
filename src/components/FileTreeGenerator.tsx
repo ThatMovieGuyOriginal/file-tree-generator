@@ -1,21 +1,25 @@
-// src/components/FileTreeGenerator.tsx
+// src/components/FileTreeGenerator.tsx - CORRECTED IMPORTS AND ICON FIXES
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Settings, Eye, Rocket } from 'lucide-react';
+import { Sparkles, Settings, Eye, Rocket, Database, Shield, Palette, TestTube, Check, Loader2 } from 'lucide-react';
 import { TreeNode as TreeNodeType } from '@/types/fileTree';
 import { ProjectSettings } from '@/types/project';
 import { templateManager, Template } from '@/lib/template-manager';
 import { deploymentManager, DeploymentPlatform } from '@/lib/deployment-manager';
+import { pluginManager } from '@/lib/pluginManager';
 import { EnhancedPreview } from '@/steps/step-3-preview/components/EnhancedPreview';
 import { WizardHeader } from './wizard/WizardHeader';
 import { WizardNavigation } from './wizard/WizardNavigation';
-import { TemplateSelection } from './wizard/TemplateSelection';
-import { ProjectConfiguration } from './wizard/ProjectConfiguration';
+import { WizardStep } from './wizard/WizardStep';
+import { TemplateSelection } from '@/steps/step-1-template-selection/components/TemplateSelection';
+import { ProjectConfiguration } from '@/steps/step-2-configuration/components/ProjectConfiguration';
 import { ProjectPreview } from './wizard/ProjectPreview';
 import { ProjectGeneration } from '@/steps/step-4-generation/components/ProjectGeneration';
 import { getDeploymentUrl } from '@/lib/utils/deployment-utils';
+import { getPreviewTemplate } from '@/lib/preview-templates';
 
+// Initialize plugin manager on component mount
 const FileTreeGenerator = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedTemplate, setSelectedTemplate] = useState('nextjs-saas-complete');
@@ -48,6 +52,36 @@ const FileTreeGenerator = () => {
     { id: 'preview', name: 'Preview', icon: Eye },
     { id: 'generate', name: 'Generate', icon: Rocket }
   ];
+
+  useEffect(() => {
+    // Initialize plugin manager and load templates
+    const initializeGenerators = async () => {
+      try {
+        await pluginManager.initialize();
+        setTemplates(templateManager.getAllTemplates());
+        setDeploymentPlatforms(deploymentManager.getAllPlatforms());
+        
+        // Set default configurations using plugin manager capabilities
+        const availablePlugins = pluginManager.getAllPlugins();
+        const defaultPlugin = availablePlugins.find(p => p.id === 'nextjs');
+        
+        setConfigurations({
+          database: 'prisma',
+          auth: 'nextauth',
+          ui: 'shadcn',
+          testing: 'vitest',
+          selectedPlugin: defaultPlugin?.id || 'nextjs'
+        });
+      } catch (error) {
+        console.error('Failed to initialize generators:', error);
+        // Fallback to basic setup
+        setTemplates(templateManager.getAllTemplates());
+        setDeploymentPlatforms(deploymentManager.getAllPlatforms());
+      }
+    };
+    
+    initializeGenerators();
+  }, []);
 
   useEffect(() => {
     // Load templates and platforms
