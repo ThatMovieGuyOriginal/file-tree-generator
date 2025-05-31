@@ -31,7 +31,8 @@
     "@prisma/client": "^5.0.0",
     "stripe": "^14.0.0",
     "@stripe/stripe-js": "^2.0.0",
-    "@radix-ui/react-slot": "^1.0.2"
+    "@radix-ui/react-slot": "^1.0.2",
+    "class-variance-authority": "^0.7.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
