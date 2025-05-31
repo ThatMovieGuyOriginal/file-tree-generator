@@ -356,9 +356,6 @@ const FileTreeGenerator = () => {
   );
 };
 
-// Import WizardStep from the components we created earlier
-import { WizardStep } from './wizard/WizardStep';
-
 // Feature Highlight Component
 interface FeatureHighlightProps {
   icon: string;
