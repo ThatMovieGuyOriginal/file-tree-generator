@@ -1,4 +1,4 @@
-// src/components/FileTreeGenerator.tsx
+// src/components/FileTreeGenerator.tsx - updated
 'use client';
 
 import React, { useState, useEffect } from 'react';
