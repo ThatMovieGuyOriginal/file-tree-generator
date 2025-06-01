@@ -1,6 +1,6 @@
 {
   "name": "file-tree-generator",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "private": true,
   "description": "Transform file structures into complete projects with generated content",
   "keywords": ["nextjs", "react", "file-generator", "developer-tools"],
@@ -10,7 +10,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint --fix",
     "type-check": "tsc --noEmit",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -19,7 +19,9 @@
     "test:templates": "vitest run tests/template-manager.test.ts",
     "test:deployment": "vitest run tests/deployment-manager.test.ts",
     "test:integration": "vitest run tests/integration/",
-    "test:e2e": "vitest run tests/e2e/"
+    "test:e2e": "vitest run tests/e2e/",
+    "test:security": "vitest run tests/security/",
+    "analyze": "ANALYZE=true npm run build"
   },
   "dependencies": {
     "next": "14.2.5",
@@ -34,12 +36,16 @@
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "tailwind-merge": "^2.0.0"
+    "tailwind-merge": "^2.0.0",
+    "isomorphic-dompurify": "^2.0.0",
+    "lodash": "^4.17.21",
+    "use-debounce": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@types/lodash": "^4.14.202",
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.5",
@@ -51,7 +57,8 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/jest-dom": "^5.16.5",
     "jsdom": "^22.1.0",
-    "prisma": "^5.0.0"
+    "prisma": "^5.0.0",
+    "@next/bundle-analyzer": "^14.2.5"
   },
   "engines": {
     "node": ">=18.0.0"
