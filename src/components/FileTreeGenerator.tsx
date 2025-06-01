@@ -13,7 +13,7 @@ import { WizardNavigation } from './wizard/WizardNavigation';
 import { WizardStep } from './wizard/WizardStep';
 import { TemplateSelection } from './wizard/TemplateSelection';
 import { ProjectConfiguration } from './wizard/ProjectConfiguration';
-import { ProjectGeneration } from /.wizard/ProjectGeneration';
+import { ProjectGeneration } from ./wizard/ProjectGeneration';
 import { ProjectPreview } from './wizard/ProjectPreview';
 
 const FileTreeGenerator = () => {
