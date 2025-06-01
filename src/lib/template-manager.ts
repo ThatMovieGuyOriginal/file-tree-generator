@@ -26,6 +26,7 @@ export interface StackConfiguration {
   deployment: 'vercel' | 'netlify' | 'railway' | 'digitalocean';
   testing?: 'vitest' | 'jest' | 'playwright' | 'cypress';
   analytics?: 'ga4' | 'plausible' | 'mixpanel' | 'posthog';
+  selectedPlugin?: string;
 }
 
 export class TemplateManager {
