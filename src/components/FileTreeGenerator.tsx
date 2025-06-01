@@ -1,4 +1,4 @@
-// src/components/FileTreeGenerator.tsx
+// src/components/FileTreeGenerator.tsx - Updated with streamlined workflow
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -8,28 +8,30 @@ import { ProjectSettings } from 'src/types/project';
 import { templateManager, Template } from 'src/lib/template-manager';
 import { deploymentManager, DeploymentPlatform } from 'src/lib/deployment-manager';
 import { pluginManager } from 'src/lib/pluginManager';
-import { EnhancedPreview } from 'src/steps/step-3-preview/components/EnhancedPreview';
 import { WizardHeader } from './wizard/WizardHeader';
 import { WizardNavigation } from './wizard/WizardNavigation';
 import { WizardStep } from './wizard/WizardStep';
 import { TemplateSelection } from './wizard/TemplateSelection';
 import { ProjectConfiguration } from './wizard/ProjectConfiguration';
 import { ProjectPreview } from './wizard/ProjectPreview';
-import { ProjectGeneration } from './wizard/ProjectGeneration';
-import { getDeploymentUrl } from 'src/lib/utils/deployment-utils';
-import { getPreviewTemplate } from 'src/lib/preview-templates';
+import { StreamlinedGeneration } from './wizard/StreamlinedGeneration';
 
-// Initialize plugin manager on component mount
 const FileTreeGenerator = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedTemplate, setSelectedTemplate] = useState('nextjs-saas-complete');
   const [configurations, setConfigurations] = useState<Record<string, any>>({});
-  const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedProject, setGeneratedProject] = useState<{
     tree: TreeNodeType;
     files: Record<string, string>;
     template: Template;
+    actualStats: {
+      totalFiles: number;
+      totalLines: number;
+      totalSize: number;
+      dependencies: number;
+      devDependencies: number;
+    };
   } | null>(null);
   const [projectSettings, setProjectSettings] = useState<ProjectSettings>({
     name: '',
@@ -54,14 +56,12 @@ const FileTreeGenerator = () => {
   ];
 
   useEffect(() => {
-    // Initialize plugin manager and load templates
     const initializeGenerators = async () => {
       try {
         await pluginManager.initialize();
         setTemplates(templateManager.getAllTemplates());
         setDeploymentPlatforms(deploymentManager.getAllPlatforms());
         
-        // Set default configurations using plugin manager capabilities
         const availablePlugins = pluginManager.getAllPlugins();
         const defaultPlugin = availablePlugins.find(p => p.id === 'nextjs');
         
@@ -74,27 +74,12 @@ const FileTreeGenerator = () => {
         });
       } catch (error) {
         console.error('Failed to initialize generators:', error);
-        // Fallback to basic setup
         setTemplates(templateManager.getAllTemplates());
         setDeploymentPlatforms(deploymentManager.getAllPlatforms());
       }
     };
     
     initializeGenerators();
-  }, []);
-
-  useEffect(() => {
-    // Load templates and platforms
-    setTemplates(templateManager.getAllTemplates());
-    setDeploymentPlatforms(deploymentManager.getAllPlatforms());
-    
-    // Set default configurations
-    setConfigurations({
-      database: 'prisma',
-      auth: 'nextauth',
-      ui: 'shadcn',
-      testing: 'vitest'
-    });
   }, []);
 
   const selectedTemplateData = templates.find(t => t.id === selectedTemplate);
@@ -112,10 +97,49 @@ const FileTreeGenerator = () => {
   };
 
   const handleStepClick = (stepIndex: number) => {
-    // Allow navigation to previous steps or current step
     if (stepIndex <= currentStep) {
       setCurrentStep(stepIndex);
     }
+  };
+
+  const calculateActualStats = (files: Record<string, string>, template: Template) => {
+    const totalFiles = Object.keys(files).length;
+    const totalLines = Object.values(files).reduce((acc, content) => 
+      acc + content.split('\n').length, 0
+    );
+    const totalSize = Object.values(files).reduce((acc, content) => 
+      acc + new Blob([content]).size, 0
+    );
+
+    // Calculate actual dependencies from package.json
+    let dependencies = 0;
+    let devDependencies = 0;
+    
+    const packageJsonContent = files['package.json'];
+    if (packageJsonContent) {
+      try {
+        const packageJson = JSON.parse(packageJsonContent);
+        dependencies = Object.keys(packageJson.dependencies || {}).length;
+        devDependencies = Object.keys(packageJson.devDependencies || {}).length;
+      } catch (error) {
+        console.error('Error parsing package.json for stats:', error);
+        // Set to NaN if we can't calculate
+        dependencies = NaN;
+        devDependencies = NaN;
+      }
+    } else {
+      // Set to NaN if package.json doesn't exist
+      dependencies = NaN;
+      devDependencies = NaN;
+    }
+
+    return {
+      totalFiles,
+      totalLines,
+      totalSize,
+      dependencies,
+      devDependencies
+    };
   };
 
   const handleGenerate = async () => {
@@ -129,13 +153,15 @@ const FileTreeGenerator = () => {
         configurations
       );
       
+      const actualStats = calculateActualStats(files, selectedTemplateData);
+      
       setGeneratedProject({
         tree,
         files,
-        template: selectedTemplateData
+        template: selectedTemplateData,
+        actualStats
       });
       
-      setShowPreview(true);
     } catch (error) {
       console.error('Error generating project:', error);
       alert('Error generating project. Please try again.');
@@ -154,7 +180,6 @@ const FileTreeGenerator = () => {
         generatedProject.tree
       );
       
-      // Add deployment config to files
       const updatedFiles = { ...generatedProject.files };
       
       switch (platform) {
@@ -172,12 +197,14 @@ const FileTreeGenerator = () => {
           break;
       }
       
+      const actualStats = calculateActualStats(updatedFiles, generatedProject.template);
+      
       setGeneratedProject({
         ...generatedProject,
-        files: updatedFiles
+        files: updatedFiles,
+        actualStats
       });
       
-      // Open deployment platform
       const deploymentUrl = getDeploymentUrl(platform, projectSettings.name || 'my-project');
       window.open(deploymentUrl, '_blank');
       
@@ -194,19 +221,16 @@ const FileTreeGenerator = () => {
       const JSZip = (await import('jszip')).default;
       const zip = new JSZip();
       
-      // Add all files to zip
       Object.entries(generatedProject.files).forEach(([path, content]) => {
         zip.file(path, content);
       });
       
-      // Generate enhanced documentation
-      const deploymentGuide = generateDeploymentGuide(generatedProject.template, projectSettings);
+      const deploymentGuide = generateDeploymentGuide(generatedProject.template, projectSettings, generatedProject.actualStats);
       zip.file('DEPLOYMENT.md', deploymentGuide);
       
       const setupScript = generateSetupScript(projectSettings);
       zip.file('setup.sh', setupScript);
       
-      // VS Code configuration
       zip.file('.vscode/settings.json', generateVSCodeSettings());
       zip.file('.vscode/extensions.json', generateVSCodeExtensions());
       
@@ -230,32 +254,6 @@ const FileTreeGenerator = () => {
       alert('Error generating download. Please try again.');
     }
   };
-
-  if (showPreview && generatedProject) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-6">
-            <button
-              onClick={() => setShowPreview(false)}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
-            >
-              ← Back to Generator
-            </button>
-          </div>
-          
-          <EnhancedPreview
-            tree={generatedProject.tree}
-            files={generatedProject.files}
-            settings={projectSettings}
-            template={generatedProject.template}
-            onDeploy={handleDeploy}
-            onDownload={handleDownload}
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -310,7 +308,7 @@ const FileTreeGenerator = () => {
           )}
 
           {currentStep === 3 && (
-            <ProjectGeneration
+            <StreamlinedGeneration
               isGenerating={isGenerating}
               onGenerate={handleGenerate}
               generatedProject={generatedProject}
@@ -381,9 +379,17 @@ const FeatureHighlight: React.FC<FeatureHighlightProps> = ({
   );
 };
 
-// Helper functions (these should be moved to separate utility files)
-const generateDeploymentGuide = (template: Template, settings: ProjectSettings): string => {
+// Helper functions for generating actual stats-based content
+const generateDeploymentGuide = (template: Template, settings: ProjectSettings, actualStats: any): string => {
   return `# 🚀 Deployment Guide for ${settings.name || template.name}
+
+## Project Statistics
+
+- **Total Files Generated:** ${actualStats.totalFiles}
+- **Total Lines of Code:** ${actualStats.totalLines.toLocaleString()}
+- **Project Size:** ${Math.round(actualStats.totalSize / 1024)}KB
+- **Dependencies:** ${isNaN(actualStats.dependencies) ? 'Unable to calculate' : actualStats.dependencies}
+- **Dev Dependencies:** ${isNaN(actualStats.devDependencies) ? 'Unable to calculate' : actualStats.devDependencies}
 
 ## Quick Start
 
@@ -424,17 +430,14 @@ const generateSetupScript = (settings: ProjectSettings): string => {
 # ${settings.name || 'Project'} Setup Script
 echo "🚀 Setting up ${settings.name || 'your project'}..."
 
-# Check Node.js version
 if ! command -v node &> /dev/null; then
     echo "❌ Node.js is not installed. Please install Node.js 18+"
     exit 1
 fi
 
-# Install dependencies
 echo "📦 Installing dependencies..."
 npm install
 
-# Create .env.local if it doesn't exist
 if [ ! -f .env.local ]; then
     echo "📝 Creating .env.local file..."
     echo "NEXT_PUBLIC_APP_NAME=\\"${settings.name || 'My App'}\\"" > .env.local
@@ -468,6 +471,23 @@ const generateVSCodeExtensions = (): string => {
       "dbaeumer.vscode-eslint"
     ]
   }, null, 2);
+};
+
+const getDeploymentUrl = (platform: DeploymentPlatform['id'], projectName: string): string => {
+  const encodedName = encodeURIComponent(projectName);
+  
+  switch (platform) {
+    case 'vercel':
+      return `https://vercel.com/new/clone?repository-url=https://github.com/yourusername/${encodedName}`;
+    case 'netlify':
+      return `https://app.netlify.com/start/deploy?repository=https://github.com/yourusername/${encodedName}`;
+    case 'railway':
+      return `https://railway.app/new/template?template=https://github.com/yourusername/${encodedName}`;
+    case 'digitalocean':
+      return `https://cloud.digitalocean.com/apps/new?repo=https://github.com/yourusername/${encodedName}`;
+    default:
+      return 'https://github.com';
+  }
 };
 
 export default FileTreeGenerator;
