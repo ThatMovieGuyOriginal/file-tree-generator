@@ -459,7 +459,7 @@ export const ProjectConfiguration: React.FC<ProjectConfigurationProps> = ({
               if (!option) return null;
               
               return (
-                <div key={key} className={`px-4 py-2 bg-gradient-to-r ${category.color} text-white rounded-lg font-medium text-sm shadow-lg`}>
+                <div key={key} className={`px-4 py-2 bg-gradient-to-r ${category?.color || 'from-gray-500 to-gray-600'} text-white rounded-lg font-medium text-sm shadow-lg`}>
                   {option.name}
                 </div>
               );
