@@ -1,10 +1,16 @@
-// src/components/wizard/ProjectConfiguration.tsx
 'use client';
 
 import React from 'react';
 import { Database, Shield, Palette, TestTube } from 'lucide-react';
 import { ProjectSettings } from '@/types/project';
 import { ConfigurationSection } from '@/steps/step-2-configuration/components/ConfigurationSection';
+
+interface ProjectConfigurationProps {
+  settings: ProjectSettings;
+  onSettingsChange: (settings: ProjectSettings) => void;
+  configurations: Record<string, any>;
+  onConfigurationChange: (configurations: Record<string, any>) => void;
+}
 
 const configCategories = [
   {
