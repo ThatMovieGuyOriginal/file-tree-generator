@@ -1,4 +1,4 @@
-// src/components/FileTreeGenerator.tsx - Updated with streamlined workflow
+// src/components/FileTreeGenerator.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -13,8 +13,8 @@ import { WizardNavigation } from './wizard/WizardNavigation';
 import { WizardStep } from './wizard/WizardStep';
 import { TemplateSelection } from './wizard/TemplateSelection';
 import { ProjectConfiguration } from './wizard/ProjectConfiguration';
+import [ ProjectGeneration } from /.wizard/ProjectGeneration';
 import { ProjectPreview } from './wizard/ProjectPreview';
-import { StreamlinedGeneration } from './wizard/StreamlinedGeneration';
 
 const FileTreeGenerator = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -308,7 +308,7 @@ const FileTreeGenerator = () => {
           )}
 
           {currentStep === 3 && (
-            <StreamlinedGeneration
+            <ProjectGeneration
               isGenerating={isGenerating}
               onGenerate={handleGenerate}
               generatedProject={generatedProject}
