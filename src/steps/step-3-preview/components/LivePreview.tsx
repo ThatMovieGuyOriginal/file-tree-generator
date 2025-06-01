@@ -78,3 +78,16 @@ export const LivePreview: React.FC<LivePreviewProps> = ({ template }) => {
     </div>
   );
 };
+
+const getDeviceStyles = (mode: DeviceMode): string => {
+  switch (mode) {
+    case 'desktop':
+      return 'w-full h-96';
+    case 'tablet':
+      return 'w-3/4 h-96 mx-auto';
+    case 'mobile':
+      return 'w-96 h-96 mx-auto';
+    default:
+      return 'w-full h-96';
+  }
+};
