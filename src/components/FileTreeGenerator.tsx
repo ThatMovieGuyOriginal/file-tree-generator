@@ -1,4 +1,4 @@
-// src/components/FileTreeGenerator.tsx - test
+// src/components/FileTreeGenerator.tsx
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
